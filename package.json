@@ -1,0 +1,45 @@
+{
+  "name": "my-app",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@aws-amplify/auth": "^4.3.18",
+    "aws-amplify": "^1.1.19",
+    "aws-amplify-react": "^2.3.0",
+    "aws-crt": "^1.10.5",
+    "aws-iot-device-sdk": "^2.2.1",
+    "aws-iot-device-sdk-v2": "^1.6.5",
+    "aws-sdk": "^2.1048.0",
+    "dotenv": "^10.0.0",
+    "react": "^16.8.1",
+    "react-dom": "^16.8.1",
+    "react-jwt": "^1.1.4",
+    "react-router-dom": "^5.2.0",
+    "react-scripts": "2.1.5",
+    "react-spring": "^9.3.2"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
