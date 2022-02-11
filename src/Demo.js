@@ -17,7 +17,7 @@ export default function Demo(props) {
         let currentCredentials = await Auth.currentCredentials();
         var essentialCredentials = await Auth.essentialCredentials(currentCredentials);
         const connection = build_websocket_mqtt_connection_from_args(essentialCredentials);
-        const timer = setInterval(() => { }, 60 * 1000);
+        // const timer = setInterval(() => { }, 60 * 1000);
 
         connection.on('connect', function () {
             console.log('connect')
@@ -37,10 +37,10 @@ export default function Demo(props) {
         await connection.connect();
         await execute_session(connection, argv);
 
-        await connection.disconnect();
+        // await connection.disconnect();
 
         // Allow node to die if the promise above resolved
-        clearTimeout(timer);
+        // clearTimeout(timer);
     }
 
     /* Build an mqtt connection using websockets, (http) proxy optional.*/
