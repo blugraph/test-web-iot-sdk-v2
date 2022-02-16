@@ -9,8 +9,10 @@ import Amplify from 'aws-amplify';
 import { Auth } from '@aws-amplify/auth';
 
 import awsconfig from '../aws-exports';
-Amplify.configure(awsconfig);
+import Reinitialize from "../Reinitialize";
+import RefreshCredentials from "../RefreshCredentials";
 
+Amplify.configure(awsconfig);
 // >>New - Configuring Auth Module
 Auth.configure(awsconfig);
 
@@ -21,7 +23,8 @@ export default function Routes(props) {
       <Switch>
             <Route exact path="/"><Home  {...props} /></Route>
             <Route exact path="/demo">< Demo {...props} /></Route>
-
+            <Route exact path="/reconnect-reinitialize">< Reinitialize {...props} /></Route>
+            <Route exact path="/reconnect-refresh">< RefreshCredentials {...props} /></Route>
       </Switch>
     </Router>
   );
