@@ -6,6 +6,8 @@ import AWSConfiguration from './aws-iot-configuration';
 import { Auth } from '@aws-amplify/auth';
 import { decodeToken } from "react-jwt";
 
+var mqttClient = null;
+
 export default function Reinitialize(props) {
     const [isConnected, setIsConnected] = useState(false);
     const [vehicleDetails, setVehicleDetails] = useState([]);
@@ -20,7 +22,7 @@ export default function Reinitialize(props) {
     useEffect(() => {
         if (reconnect > 0) {
             const current_unix_time = Math.round((new Date()).getTime() / 1000);
-            if (credential.token_exp_time < current_unix_time) {
+            if (!mqttClient || !credential || (credential.token_exp_time < current_unix_time)) {
                 initialize();
             } else {
                 console.log('bg-aws-app-iot-tokens are still valid.');
@@ -29,10 +31,25 @@ export default function Reinitialize(props) {
     }, [reconnect])
 
     async function initialize() {
-        let credentials = await authCredentials();
-        setCredentials(credentials);
-        console.log('token_exp_time_initialize ', credentials.token_exp_time, ' current time ', Math.round((new Date()).getTime() / 1000));
-        connectToMqttClient(credentials);
+        try {
+            let credentials = await authCredentials();
+            setCredentials(credentials);
+            console.log('token_exp_time_initialize ', credentials.token_exp_time, ' current time ', Math.round((new Date()).getTime() / 1000));
+            if (mqttClient) {
+                mqttClient.end();
+                mqttClient = null;
+            }
+            // TODO: Handle failure (trigger initialize again).
+            connectToMqttClient(credentials);
+            //Check, After 30 sec, setReconnect(rc => rc + 1);
+        }
+        catch (err) {
+            console.log("Cred Refresh Err: ", err);
+            if (!mqttClient) {
+                console.log("No active MQTT connection, try again after some time..");
+                //After 30 sec, setReconnect(rc => rc + 1);
+            }
+        }
     }
 
     async function authCredentials() {
@@ -50,8 +67,8 @@ export default function Reinitialize(props) {
     }
 
     const connectToMqttClient = (creds) => {
-        let clientId = 'bg-aws-app-iot' + (Math.floor((Math.random() * 100000) + 1));
-        var mqttClient = AWSIoTData.device({
+        let clientId = 'bg-aws-app-iot-reinit'; // + (Math.floor((Math.random() * 100000) + 1));
+        mqttClient = AWSIoTData.device({
             region: AWSConfiguration.region,
             host: AWSConfiguration.host,
             clientId: clientId,
@@ -66,6 +83,7 @@ export default function Reinitialize(props) {
 
         mqttClient.on('connect', function (err, callback) {
             console.log(new Date().toLocaleString() + ' bg-aws-app-iot-connect');
+            // Where will connected be set to false?
             setIsConnected(true); setReconnect(0);
             mqttClient.subscribe(process.env.REACT_APP_SUBSCRIBE);
         });
@@ -78,6 +96,8 @@ export default function Reinitialize(props) {
 
         mqttClient.on('close', function (err) {
             console.log(new Date().toLocaleString() + ' bg-aws-app-iot-close')
+            setIsConnected(false);
+            //After 30 sec, setReconnect(rc => rc + 1);
         });
         mqttClient.on('reconnect', function (callback) {
             console.log(new Date().toLocaleString() + ' bg-aws-app-iot-reconnect');
@@ -85,12 +105,21 @@ export default function Reinitialize(props) {
         });
         mqttClient.on('end', function () {
             console.log(new Date().toLocaleString() + ' bg-aws-app-iot-end')
+            // if(isConnected),
+            //setIsConnected(false);
+            //After 40 sec, setReconnect(rc => rc + 1);
         });
         mqttClient.on('offline', function () {
             console.log(new Date().toLocaleString() + ' bg-aws-app-iot-offline')
+            // if(isConnected),
+            //setIsConnected(false);
+            //After 60 sec, setReconnect(rc => rc + 1);
         });
         mqttClient.on('error', function (error) {
             console.log(new Date().toLocaleString() + ' bg-aws-app-iot-error')
+            // if(isConnected),
+            //setIsConnected(false);
+            //After 50 sec, setReconnect(rc => rc + 1);
         });
         mqttClient.on('packetsend', function (packet) {
             console.log(new Date().toLocaleString() + ' bg-aws-app-iot-packetsend')
@@ -102,8 +131,8 @@ export default function Reinitialize(props) {
 
     return (<>
         <h1>Reconnect - Reinitialize the connection</h1>
-        {vehicleDetails && vehicleDetails.length > 0 && vehicleDetails.map((vehicle,index) => {
-            return <h3 key={"vehicle "+index}>{vehicle.cpn}</h3>
+        {vehicleDetails && vehicleDetails.length > 0 && vehicleDetails.map((vehicle, index) => {
+            return <h3 key={"vehicle " + index}>{vehicle.cpn}</h3>
         })}
     </>
     )
