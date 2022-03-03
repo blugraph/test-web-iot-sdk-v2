@@ -11,6 +11,9 @@ import { Auth } from '@aws-amplify/auth';
 import awsconfig from '../aws-exports';
 import Reinitialize from "../Reinitialize";
 import RefreshCredentials from "../RefreshCredentials";
+//updateWebSocketCredentials - routes
+import UpdateWebSocket from "../UpdateWebSocket";
+import RefreshUpdateWebSocket from "../RefreshUpdateWebSocket";
 
 Amplify.configure(awsconfig);
 // >>New - Configuring Auth Module
@@ -23,8 +26,14 @@ export default function Routes(props) {
       <Switch>
             <Route exact path="/"><Home  {...props} /></Route>
             <Route exact path="/demo">< Demo {...props} /></Route>
+
             <Route exact path="/reconnect-reinitialize">< Reinitialize {...props} /></Route>
             <Route exact path="/reconnect-refresh">< RefreshCredentials {...props} /></Route>
+
+            {/* updateWebSocketCredentials - routes */}
+            <Route exact path="/update-web-socket">< UpdateWebSocket {...props} /></Route>
+            <Route exact path="/reconnect-update-credentials">< RefreshUpdateWebSocket {...props} /></Route>
+
       </Switch>
     </Router>
   );
