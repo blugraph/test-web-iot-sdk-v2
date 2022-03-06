@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from "react";
-import Amplify from 'aws-amplify';
-import awsConfig from './aws-exports';
 import AWSIoTData from 'aws-iot-device-sdk';
 import AWSConfiguration from './aws-iot-configuration';
 import { Auth } from '@aws-amplify/auth';
@@ -36,9 +34,9 @@ export default function UpdateWebSocket(props) {
         mqttClientCallBacks(mqttClient);
 
         authCredentials().then(response => {
-            mqttClient.updateWebSocketCredentials(response.essentialCredentials.AccessKeyId,
-                response.essentialCredentials.SecretKey,
-                response.essentialCredentials.SessionToken);
+            mqttClient.updateWebSocketCredentials(response.essentialCredentials.accessKeyId,
+                response.essentialCredentials.secretAccessKey,
+                response.essentialCredentials.sessionToken);
         })
     }
 
@@ -70,7 +68,7 @@ export default function UpdateWebSocket(props) {
             var newMessage = JSON.parse(`${payload.toString()}`);
             setMessage(newMessage);
             setVehicleDetails(state => [newMessage, ...state]);
-        })
+        });
 
         mqttClient.on('close', function (err) {
             console.log(new Date().toLocaleString() + ' bg-aws-app-iot-close')

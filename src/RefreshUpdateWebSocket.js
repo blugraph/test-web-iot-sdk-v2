@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from "react";
-import Amplify from 'aws-amplify';
-import awsConfig from './aws-exports';
 import AWSIoTData from 'aws-iot-device-sdk';
 import AWSConfiguration from './aws-iot-configuration';
 import { Auth } from '@aws-amplify/auth';
@@ -15,11 +13,22 @@ export default function RefreshUpdateWebSocket(props) {
     const [credential, setCredentials] = useState();
 
     var clientId = 'bg-aws-app-iot-updateWebSocketCreds'; // + (Math.floor((Math.random() * 100000) + 1));
-    
+
     useEffect(() => {
         initialize();
     }, [])
 
+
+    useEffect(() => {
+        if (reconnect > 0) {
+            const current_unix_time = Math.round((new Date()).getTime() / 1000);
+            if (credential.token_exp_time < current_unix_time) {
+                reInitialize();
+            } else {
+                console.log('bg-aws-app-iot-tokens are still valid.');
+            }
+        }
+    }, [reconnect])
 
     async function initialize() {
         let credentials = await authCredentials();
@@ -28,18 +37,20 @@ export default function RefreshUpdateWebSocket(props) {
         connectToMqttClient(credentials);
     }
 
-    useEffect(() => {
-        if (reconnect > 0) {
-            const current_unix_time = Math.round((new Date()).getTime() / 1000);
-            if (credential.token_exp_time < current_unix_time) {
-                mqttClient.updateWebSocketCredentials(credential.essentialCredentials.AccessKeyId,
-                    credential.essentialCredentials.SecretKey,
-                    credential.essentialCredentials.SessionToken);
-            } else {
-                console.log('bg-aws-app-iot-tokens are still valid.');
-            }
+    async function reInitialize() {
+        try {
+            let response = await authCredentials();
+            setCredentials(response);
+            console.log('token_exp_time_initialize ', response.token_exp_time, ' current time ', Math.round((new Date()).getTime() / 1000));
+            mqttClient.updateWebSocketCredentials(response.essentialCredentials.accessKeyId,
+                response.essentialCredentials.secretAccessKey,
+                response.essentialCredentials.sessionToken);
+            //connectToMqttClient(credentials);
         }
-    }, [reconnect])
+        catch (err) {
+            console.log("Get Cred error.");
+        }
+    }
 
     async function authCredentials() {
         // to get the tokens for cognito user 
