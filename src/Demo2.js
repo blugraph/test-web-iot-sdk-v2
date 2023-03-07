@@ -60,6 +60,7 @@ export default function Demo2(props){
             console.log(new Date().toLocaleString() + ' bg-aws-app-iot-connect');
             // Where will connected be set to false?
             setIsConnected(true);
+            console.log("Subscribing to, ", process.env.REACT_APP_SUBSCRIBE);
             mqttClient.subscribe(process.env.REACT_APP_SUBSCRIBE);
         });
 
@@ -92,7 +93,7 @@ export default function Demo2(props){
             console.log(new Date().toLocaleString() + ' bg-aws-app-iot-packetreceive')
         });
     }
-    console.log('Message List ',vehicleDetails)
+    //console.log('Message List ',vehicleDetails)
     return(
         <h6>Demo2</h6>
     )

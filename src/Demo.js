@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { Auth } from '@aws-amplify/auth';
-import { mqtt, iot } from 'aws-crt/dist.browser/browser';
+//import { mqtt, iot } from 'aws-crt/dist.browser/browser';
+import { mqtt, iot, auth } from "aws-iot-device-sdk-v2";
 import awsconfig from './aws-exports';
 import Amplify from 'aws-amplify';
 
