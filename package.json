@@ -8,7 +8,7 @@
     "aws-amplify-react": "^2.3.0",
     "aws-crt": "^1.10.5",
     "aws-iot-device-sdk": "^2.2.1",
-    "aws-iot-device-sdk-v2": "^1.6.5",
+    "aws-iot-device-sdk-v2": "latest",
     "aws-sdk": "^2.1048.0",
     "dotenv": "^10.0.0",
     "react": "^16.8.1",
