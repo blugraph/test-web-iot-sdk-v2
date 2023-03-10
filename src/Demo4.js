@@ -90,11 +90,17 @@ export default function Demo4(props) {
                 log('Connected');
                 resolve(connection);
             });
+            connection.on('reconnect', function (callback) {
+                console.log(new Date().toLocaleString() + ' bg-aws-app-iot-reconnect');
+                provider.refreshCredentialAsync();
+            });
             connection.on("interrupt", (error) => {
                 log(`Connection interrupted: error=${error}`);
             });
             connection.on("resume", (return_code, session_present) => {
                 log(`Resumed: rc: ${return_code} existing session: ${session_present}`);
+                provider.refreshCredentialAsync();
+                log("Credentials refreshed.");
             });
             connection.on("disconnect", () => {
                 log("Disconnected");
